@@ -1,5 +1,7 @@
 app = {
-  LED = 1,
+  LED_R = 3,
+  LED_G = 1,
+  LED_B = 2,
   SYS_TIMER_TICK_ID = 0,
   SYS_TIMER_ID = 1,
   SYS_INTERVAL = 10,
@@ -40,15 +42,54 @@ local function async_sleep(miseconds)
 end
 
 local function blink(ms)
-  gpio.write(app.LED, gpio.HIGH);
+  gpio.write(app.LED_B, gpio.LOW);
   async_sleep(ms);
-  gpio.write(app.LED, gpio.LOW);
+  gpio.write(app.LED_B, gpio.HIGH);
   async_sleep(ms);
 end
 
+local function color(r, g, b, ms)
+  if r == 1 then gpio.write(app.LED_R, gpio.LOW) end
+  if g == 1 then gpio.write(app.LED_G, gpio.LOW) end
+  if b == 1 then gpio.write(app.LED_B, gpio.LOW) end
+  async_sleep(ms)
+  if r == 1 then gpio.write(app.LED_R, gpio.HIGH) end
+  if g == 1 then gpio.write(app.LED_G, gpio.HIGH) end
+  if b == 1 then gpio.write(app.LED_B, gpio.HIGH) end
+  async_sleep(ms)
+end
+
+local function style_RGB(interval)
+  color(1, 0, 0, interval)
+  color(0, 1, 0, interval)
+  color(0, 0, 1, interval)
+end
+
+local function style_FULL(interval)
+  color(0, 0, 1, interval)
+  color(0, 1, 0, interval)
+  color(0, 1, 1, interval)
+  color(1, 0, 0, interval)
+  color(1, 0, 1, interval)
+  color(1, 1, 0, interval)
+  color(1, 1, 1, interval)
+end
+
+function frames_style(tick, interval, style)
+  for i=1, tick do
+    style(interval)
+  end
+end
+
+
 local function task()
-  for i=1, 30 do
-    blink(50);
+  for i=1, 1 do
+    frames_style(3, 50, style_RGB)
+    frames_style(2, 500, style_RGB)
+    frames_style(1, 1000, style_RGB)
+    frames_style(3, 50, style_FULL)
+    frames_style(2, 500, style_FULL)
+    frames_style(1, 1000, style_FULL)
   end
 end
 
@@ -104,8 +145,10 @@ local function entry()
     end)
     tmr.alarm(app.SYS_TIMER_ID, app.SYS_INTERVAL, 1, co_timers_check);
 
-    print('setup-LED');
-    gpio.mode(app.LED, gpio.OUTPUT)
+    print('setup-LEDRGB');
+    gpio.mode(app.LED_R, gpio.OUTPUT);
+    gpio.mode(app.LED_G, gpio.OUTPUT);
+    gpio.mode(app.LED_B, gpio.OUTPUT);
 
     while wifi.sta.getip() == nil do
       blink(100);
