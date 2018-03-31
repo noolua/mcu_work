@@ -52,7 +52,7 @@ local function task()
   end
 end
 
-local function web_in_idle()
+local function run_idle()
   local ticks = 0;
   while 1 do
     local empty = true;
@@ -75,7 +75,7 @@ local function web_in_idle()
       async_sleep(1000);
     end
   end
-  print('web_in_idle exit....');
+  print('run_idle exit....');
 end
 
 local function async_send(sck, data)
@@ -96,29 +96,32 @@ local function make_response(sck, data)
   print('make_response done');
 end
 
-local function setup()
-  print('setup-CO-TIMERS')
-  tmr.alarm(app.SYS_TIMER_TICK_ID, 1, 1, function ()
-    __tm_ticks__ = __tm_ticks__ + 1;
-  end)
-  tmr.alarm(app.SYS_TIMER_ID, app.SYS_INTERVAL, 1, co_timers_check);
-
-  print('setup-LED');
-  gpio.mode(app.LED, gpio.OUTPUT)
-  print('setup-websvr: ', wifi.sta.getip());
-  srv = net.createServer(net.TCP)
-  srv:listen(80, function(conn)
-    conn:on("receive", function (sck, data)
-      local co = coroutine.create(make_response);
-      table.insert(app.web_cos, co);
-      coroutine.resume(co, sck, data);
-    end);
-  end)
-end
-
 local function entry()
-  setup();
-  local co = coroutine.create(web_in_idle);
+  local co = coroutine.create(function()
+    print('setup-TIMERS')
+    tmr.alarm(app.SYS_TIMER_TICK_ID, 1, 1, function ()
+      __tm_ticks__ = __tm_ticks__ + 1;
+    end)
+    tmr.alarm(app.SYS_TIMER_ID, app.SYS_INTERVAL, 1, co_timers_check);
+
+    print('setup-LED');
+    gpio.mode(app.LED, gpio.OUTPUT)
+
+    while wifi.sta.getip() == nil do
+      blink(100);
+    end
+    print('startup-websvr: ', wifi.sta.getip());
+    srv = net.createServer(net.TCP)
+    srv:listen(80, function(conn)
+      conn:on("receive", function (sck, data)
+        local wc = coroutine.create(make_response);
+        table.insert(app.web_cos, wc);
+        coroutine.resume(wc, sck, data);
+      end);
+    end)
+    print('running idle')
+    run_idle();
+  end);
   coroutine.resume(co)
 end
 

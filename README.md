@@ -2,7 +2,7 @@
 
 #### 刷新最新的固件
 
-  * 安装TTY的驱动PL2012或者CH340G
+  * 安装TTY的驱动CP2102或者CH340G
   * 安装esptool.py
 
 ```bash
