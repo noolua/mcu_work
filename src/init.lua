@@ -1,7 +1,7 @@
-app = {
-  LED_R = 3,
-  LED_G = 1,
-  LED_B = 2,
+local app = {
+  LED_R = 1,
+  LED_G = 2,
+  LED_B = 3,
   SYS_TIMER_TICK_ID = 0,
   SYS_TIMER_ID = 1,
   SYS_INTERVAL = 10,
@@ -9,7 +9,10 @@ app = {
   web_cos = {},
 }
 
-__tm_ticks__ = 0;
+local __tm_ticks__ = 0;
+local __EN_HIGH__ = 1;
+local EN_ON = (__EN_HIGH__ == 1 ) and gpio.HIGH or gpio.LOW;
+local EN_OFF = (__EN_HIGH__ == 1 ) and gpio.LOW or gpio.HIGH;
 
 local function tickcount()
   return __tm_ticks__;
@@ -42,20 +45,20 @@ local function async_sleep(miseconds)
 end
 
 local function blink(ms)
-  gpio.write(app.LED_B, gpio.LOW);
+  gpio.write(app.LED_B, EN_ON);
   async_sleep(ms);
-  gpio.write(app.LED_B, gpio.HIGH);
+  gpio.write(app.LED_B, EN_OFF);
   async_sleep(ms);
 end
 
 local function color(r, g, b, ms)
-  if r == 1 then gpio.write(app.LED_R, gpio.LOW) end
-  if g == 1 then gpio.write(app.LED_G, gpio.LOW) end
-  if b == 1 then gpio.write(app.LED_B, gpio.LOW) end
+  if r == 1 then gpio.write(app.LED_R, EN_ON) end
+  if g == 1 then gpio.write(app.LED_G, EN_ON) end
+  if b == 1 then gpio.write(app.LED_B, EN_ON) end
   async_sleep(ms)
-  if r == 1 then gpio.write(app.LED_R, gpio.HIGH) end
-  if g == 1 then gpio.write(app.LED_G, gpio.HIGH) end
-  if b == 1 then gpio.write(app.LED_B, gpio.HIGH) end
+  if r == 1 then gpio.write(app.LED_R, EN_OFF) end
+  if g == 1 then gpio.write(app.LED_G, EN_OFF) end
+  if b == 1 then gpio.write(app.LED_B, EN_OFF) end
   async_sleep(ms)
 end
 
