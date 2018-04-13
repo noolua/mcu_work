@@ -19,3 +19,25 @@ wifi.setmode(wifi.STATION);
 wifi.sta.config({ssid="ssid-name", pwd="ssid-password"})
 print(wifi.sta.getip());
 ```
+
+```
+# STEPS FOR FLASH NODEMCU FIRMWARE TO ESP-01S
+# 参考
+# https://www.youtube.com/watch?v=Gh_pgqjfeQc
+1.准备一款USB转串口模块UART(推荐CP2102模块)
+2.接线
+  1）下载模式（刷机模式）
+     ESP: 3V3  <--> UART:3V3
+     ESP: EN   <--> UART:3V3
+     ESP: RX   <--> UART:TXD
+     ESP: TX   <--> UART:RXD
+     ESP: GND  <--> UART:GND
+     ESP: IO0  <--> UART:GND (注意这个)
+  2) 工作模式
+     ESP: 3V3  <--> UART:3V3
+     ESP: EN   <--> UART:3V3
+     ESP: RX   <--> UART:TXD
+     ESP: TX   <--> UART:RXD
+     ESP: GND  <--> UART:GND
+
+```

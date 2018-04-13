@@ -1,7 +1,7 @@
 local app = {
-  LED_R = 1,
-  LED_G = 2,
-  LED_B = 3,
+  LED_R = 0,
+  LED_G = 3,
+  LED_B = 4,
   SYS_TIMER_TICK_ID = 0,
   SYS_TIMER_ID = 1,
   SYS_INTERVAL = 10,
@@ -154,6 +154,7 @@ local function entry()
     gpio.mode(app.LED_B, gpio.OUTPUT);
 
     while wifi.sta.getip() == nil do
+      -- print('blink ...')
       blink(100);
     end
     print('startup-websvr: ', wifi.sta.getip());
