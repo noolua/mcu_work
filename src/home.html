@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <script type="text/javascript">
+    function jsonp(np) {
+      function _format_params(data) {
+        var arr = [];
+        for (var name in data) {
+          arr.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+        }
+        return arr.join('&');
+      };
+      np = np || {};
+      np.callback = '_jsonp' + Date.now();
+      np.timeout = np.timeout || 30000;
+      np.params = np.params || {};
+      np.script = document.createElement('script');
+      np.head = document.getElementsByTagName('head')[0];
+      if (np.timeout) {
+        np.timer = setTimeout(function(np){
+          window[np.callback] = null;
+          np.head.removeChild(np.script);
+          np.error && np.error({error: -1, msg: 'timeout'});
+        }, np.timeout, np);
+      }
+      np.head.appendChild(np.script);
+      window[np.callback] = function(json) {
+        np.head.removeChild(np.script);
+        np.timer && clearTimeout(np.timer);
+        window[np.callback] = null;
+        np.success && np.success(json);
+      };
+      np.params['callback'] = np.callback;
+      np.script.src = np.url + '?' + _format_params(np.params);
+    };
+    function save_and_reboot() {
+      document.getElementById('address').innerText = "address: N/A";
+      var ssid = document.getElementById('ssid').value;
+      var password = document.getElementById('password').value;
+      if (ssid == ''){
+        alert('ssid is null');
+        return;
+      }
+      if (password == ''){
+        alert('password is null');
+        return;
+      }
+      jsonp({
+        url: 'https://www.ahub.cc/ip4',
+        params: {ssid:ssid, password:password},
+        success: function(res) {
+          document.getElementById('address').innerText = JSON.stringify(res);
+          console.log(res);
+        },
+        error: function(error) {
+          console.log('err', error);
+        }
+      });
+    }
+  </script>
+  <body>
+    <div>
+      <span id="address">address: N/A</span>
+      <br>
+      <select id="ssid" name="cars" style="width: 120px">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="fiat">Fiat</option>
+        <option value="audi">Audi</option>
+      </select>
+      <br>
+      <input type="text" id="password" name="password" placeholder="输入WIFI密码" style="width: 120px">
+      <br>
+      <input type="button" value="保存并重启" style="width: 120px" onclick="save_and_reboot();">
+    </div>
+  </body>
+</html>

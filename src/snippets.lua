@@ -115,5 +115,21 @@ print('wait for 15 seconds: file.remove("init.lua")')
 print('set TICKS=0 to disable one time')
 
 
+--[[
+ws2812 test
+--]]
+COLORS = {
+  [0] = {255, 0, 0},
+  [1] = {0, 255, 0},
+  [2] = {0, 0, 255},
+  [3] = {255, 255, 255}
+}
+ws2812.init()
+local i, buffer = 0, ws2812.newBuffer(60, 3); buffer:fill(0, 0, 0); tmr.create():alarm(5, 1, function()
+  i = i + 1
+  buffer:fade(2)
+  buffer:set(i % buffer:size() + 1, COLORS[i%4])
+  ws2812.write(buffer)
+end)
 
 

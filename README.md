@@ -11,6 +11,7 @@
 $ ls /dev/tty.*
 $ sudo esptool.py --port /dev/tty.SLAB_USBtoUART erase_flash
 $ sudo esptool.py -b 921600 --port /dev/tty.SLAB_USBtoUART write_flash -fm dio 0x00000 nodemcu-master-10-modules-2018-04-02-12-46-35-float.bin 
+$ java -jar ESPlorer.jar
 ```
 
 ```lua
